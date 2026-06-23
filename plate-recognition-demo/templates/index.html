@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>车牌识别与信息管理系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <h1>基于 OpenCV 的车牌识别与信息管理系统</h1>
+        <p>大学生计算机视觉应用实践作品，用于展示图像处理、车牌区域定位、结果展示与信息管理流程。</p>
+      </section>
+
+      <section class="card">
+        <h2>上传车辆图片</h2>
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+        <form method="post" enctype="multipart/form-data" class="upload-form">
+          <input type="file" name="image" accept="image/*">
+          <button type="submit">开始识别</button>
+        </form>
+      </section>
+
+      {% if latest_result %}
+      <section class="card">
+        <h2>本次识别结果</h2>
+        <div class="grid">
+          <div>
+            <h3>处理后图片</h3>
+            <img src="{{ url_for('processed', filename=latest_result.processed_filename) }}" alt="处理后图片">
+          </div>
+          <div>
+            <h3>车牌候选区域</h3>
+            <img src="{{ url_for('processed', filename=latest_result.crop_filename) }}" alt="车牌区域">
+          </div>
+        </div>
+        <div class="result-box">
+          <p><strong>识别结果：</strong>{{ latest_result.plate_text }}</p>
+          <p><strong>状态：</strong>{{ latest_result.status }}</p>
+          <p><strong>时间：</strong>{{ latest_result.created_at }}</p>
+        </div>
+      </section>
+      {% endif %}
+
+      <section class="card">
+        <div class="section-head">
+          <h2>历史记录</h2>
+          <a href="{{ url_for('refresh') }}">刷新页面</a>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>识别结果</th>
+              <th>状态</th>
+              <th>时间</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in records %}
+            <tr>
+              <td>{{ item.id }}</td>
+              <td>{{ item.plate_text }}</td>
+              <td>{{ item.status }}</td>
+              <td>{{ item.created_at }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="4">暂无记录</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>
